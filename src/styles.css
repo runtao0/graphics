@@ -1,0 +1,35 @@
+*, ul, li {
+  text-align: center;
+  list-style: none;
+  box-sizing: border-box;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+ul.dijkstra_grid {
+  height: 1000px;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  grid-gap: 10px;
+}
+
+ul.dijkstra_grid > li {
+  background-color: cadetblue;
+  line-height: 5em;
+}
+ul.dijkstra_grid > li.selected {
+  background-color: #3f8285;
+}
+
+ul.dijkstra_grid > li:hover {
+  opacity: 80%;
+  cursor: pointer;
+}
