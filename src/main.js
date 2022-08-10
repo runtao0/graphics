@@ -14,14 +14,15 @@ class DijkstraGrid {
     this.targetButton.classList.add('target');
   }
 
-  getNeighborKeys = (key) => {
+  getNeighborKeys = (key, isNums = false) => {
     const [ row, col ] = this.getRowCol(key);
     const neighbors = [
       [row - 1, col], // top
       [row, col - 1], // left
       [row, col + 1], // right
       [row + 1, col], // bottom
-    ]
+    ];
+    if (isNums) return neighbors;
     return neighbors.filter(([row, col]) => {
       return (0 <= row) && (row < this.rows) && (0 <= col) && (col < this.cols);
     });
@@ -77,6 +78,7 @@ class DijkstraGrid {
     const currNode = this.createBlock(key);
     this.mapNode(key, node)
     this.container.appendChild(currNode);
+    this.addNodeToNetwork(currNode)
     if (row === 0 && col === 0) currNode.appendChild(this.originButton);
     if (row === 0 && col === 39) currNode.appendChild(this.targetButton);
   }
@@ -90,13 +92,14 @@ class DijkstraGrid {
     this.removeNodes();
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
+        const currKey = this.getKey(r, c);
         this.createNode(r, c);
       }
     }
   }
 
-  toggleSelected = (ele) => {
-    ele.classList.toggle('selected');
+  toggleWall = (ele) => {
+    ele.classList.toggle('wall');
   }
 
   isInNetwork = (key) => {
@@ -132,12 +135,12 @@ class DijkstraGrid {
     const nodeEle = e.target;
     if (nodeEle.tagName !== 'LI') return;
 
-    if (nodeEle.classList.contains('selected')) { // deselect, remove edges and node
-      this.removeNodeFromNetwork(nodeEle);
-    } else { // select, add node and edges
+    if (nodeEle.classList.contains('wall')) { // reselect, add edges and node
       this.addNodeToNetwork(nodeEle);
+    } else { // deselect, remove node and edges
+      this.removeNodeFromNetwork(nodeEle);
     }
-    this.toggleSelected(nodeEle);
+    this.toggleWall(nodeEle);
     console.log('network:', this.network)
     console.log('edges:', this.edges)
   }

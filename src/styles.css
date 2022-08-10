@@ -40,14 +40,14 @@ ul.dijkstra_grid > li button {
   left: 0;
 }
 button.origin {
-  background-color: white;
+  background-color: greenyellow;
   border: none;
 }
 button.target {
   background-color: rgb(255, 0, 0);
 }
-ul.dijkstra_grid > li.selected {
-  background-color: #3f8285;
+ul.dijkstra_grid > li.wall {
+  background-color: white;
 }
 
 ul.dijkstra_grid > li:hover {
