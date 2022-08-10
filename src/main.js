@@ -6,6 +6,12 @@ class DijkstraGrid {
     this.nodes = new Map();
     this.network = new Map();
     this.edges = new Map();
+    this.originButton = document.createElement('button')
+    this.originButton.classList.add('origin');
+    this.isSetOrigin = false;
+    this.targetButton = document.createElement('button');
+    this.isSetTarget = false;
+    this.targetButton.classList.add('target');
   }
 
   getNeighborKeys = (key) => {
@@ -19,6 +25,15 @@ class DijkstraGrid {
     return neighbors.filter(([row, col]) => {
       return (0 <= row) && (row < this.rows) && (0 <= col) && (col < this.cols);
     });
+  }
+
+  getLiNodeParent = (node) => {
+    let copyNode = node;
+    while (copyNode.tagName !== 'LI' || copyNode.tagName !== 'UL') {
+      copyNode = copyNode.parentNode;
+    }
+    if (node.tagName === 'UL') return null;
+    return copyNode;
   }
 
   addEdge = (originKey, targetKey, weight = 1) => {
@@ -52,7 +67,6 @@ class DijkstraGrid {
   createBlock = function(key) {
     // creates block and adds key
     const block = document.createElement('li');
-    block.textContent = key;
     block['data-key'] = key;
     return block;
   }
@@ -63,6 +77,8 @@ class DijkstraGrid {
     const currNode = this.createBlock(key);
     this.mapNode(key, node)
     this.container.appendChild(currNode);
+    if (row === 0 && col === 0) currNode.appendChild(this.originButton);
+    if (row === 0 && col === 39) currNode.appendChild(this.targetButton);
   }
 
   mapNode = function(row, col, node) {
@@ -111,7 +127,7 @@ class DijkstraGrid {
     this.network.delete(originKey);
   }
 
-  gridListener = (e) => {
+  gridClickListener = (e) => {
     e.preventDefault();
     const nodeEle = e.target;
     if (nodeEle.tagName !== 'LI') return;
@@ -126,12 +142,41 @@ class DijkstraGrid {
     console.log('edges:', this.edges)
   }
 
-  addGridListener = function () {
-    this.container.addEventListener('click', this.gridListener);
+  listenerMouseDown = (isOrigin = true) => (e) => {
+    if (isOrigin) {
+      this.isSetOrigin = true;
+    } else {
+      this.isSetTarget = true;
+    }
+  }
+  listenerMouseUp = (isOrigin = true) => (e) => {
+    if (isOrigin) {
+      this.isSetOrigin = false;
+    } else {
+      this.isSetTarget = false;
+    }
+  }
+
+  gridHoverListener = (e) => {
+    if (e.target.tagName !== 'LI') return;
+    if (this.isSetOrigin) {
+      e.target.appendChild(this.originButton);
+    } else if (this.isSetTarget) {
+      e.target.appendChild(this.targetButton)
+    }
+  }
+
+  addGridListeners = function () {
+    this.container.addEventListener('click', this.gridClickListener);
+    this.container.addEventListener('mouseover', this.gridHoverListener);
+    this.originButton.addEventListener('mousedown', this.listenerMouseDown(true));
+    this.originButton.addEventListener('mouseup', this.listenerMouseUp(true));
+    this.targetButton.addEventListener('mousedown', this.listenerMouseDown(false));
+    this.targetButton.addEventListener('mouseup', this.listenerMouseUp(false));
   }
 }
 
 const container = document.querySelector('ul.dijkstra_grid');
-const board = new DijkstraGrid(container, 10, 10);
+const board = new DijkstraGrid(container, 32, 40);
 board.populateNodes();
-board.addGridListener();
+board.addGridListeners();
